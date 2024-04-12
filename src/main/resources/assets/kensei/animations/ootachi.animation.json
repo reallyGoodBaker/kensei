@@ -1,0 +1,31 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.weapon.ootachi.camera_fix": {
+			"loop": true,
+			"override_previous_animation": true,
+			"bones": {
+				"rightItem": {
+					"rotation": {
+						"vector": [-80.41626, -56.57523, 126.29051]
+					},
+					"position": {
+						"vector": [-15.52988, -3.90259, -4.58376]
+					}
+				}
+			}
+		},
+		"animation.weapon.ootachi.first_person": {
+			"loop": true,
+			"override_previous_animation": true,
+			"bones": {
+				"rightItem": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

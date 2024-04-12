@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Projects.kensei.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Projects.kensei.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Projects.kensei.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Projects.kensei.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kensei.iml" filepath="$PROJECT_DIR$/.idea/modules/kensei.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kensei.main.iml" filepath="$PROJECT_DIR$/.idea/modules/kensei.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kensei.test.iml" filepath="$PROJECT_DIR$/.idea/modules/kensei.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/top.rgb39.kensei.main.iml" filepath="$PROJECT_DIR$/.idea/modules/top.rgb39.kensei.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/top.rgb39.kensei.test.iml" filepath="$PROJECT_DIR$/.idea/modules/top.rgb39.kensei.test.iml" />
+    </modules>
+  </component>
+</project>
