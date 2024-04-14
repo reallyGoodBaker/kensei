@@ -15,6 +15,7 @@ import top.rgb39.ecs.arch.App;
 import top.rgb39.ecs.executor.RuntimeLabel;
 import top.rgb39.ecs.util.Logger;
 import top.rgb39.kensei_client.component.CameraFading;
+import top.rgb39.kensei_client.component.CameraRotationFading;
 import top.rgb39.kensei_client.component.PlayerStatus;
 import top.rgb39.kensei_client.events.LockEvent;
 
@@ -44,21 +45,27 @@ public class Players {
         mc = Minecraft.getInstance();
     }
 
-    void unlock(CameraFading fading, PlayerStatus status) {
+    void unlock(CameraFading fading, PlayerStatus status, CameraRotationFading rotation) {
+        var current = java.lang.System.currentTimeMillis();
         status.lockedEntity = 0;
-        fading.dx = -2.4;
-        fading.dz = -0.6;
-        fading.startTime = java.lang.System.currentTimeMillis();
+        fading.dx = 1;
+        fading.dz = 3;
+        fading.startTime = current;
+        rotation.startTime = current;
+        rotation.duration = 120;
     }
 
-    void lock(CameraFading fading, PlayerStatus status, Minecraft mc, long playerId, LockEntityPredicate predicate) {
+    void lock(CameraFading fading, CameraRotationFading rotation, PlayerStatus status, Minecraft mc, long playerId, LockEntityPredicate predicate) {
         if (mc.player != null && mc.player.getId() == playerId) {
             mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
         }
-        fading.dx = -1.6;
-        fading.dz = -1.2;
-        fading.startTime = java.lang.System.currentTimeMillis();
+        var current = java.lang.System.currentTimeMillis();
+        fading.dx = 1.6;
+        fading.dz = 1.8;
+        fading.startTime = current;
         status.lockedEntity = predicate.targetEntity.getId();
+        rotation.startTime = current + 100;
+        rotation.duration = 160;
     }
 
     @System(runtimeLabel = RuntimeLabel.BeforeUpdate)
@@ -66,11 +73,12 @@ public class Players {
             @Read(LockEvent.class) Stream<LockEvent> lockEvents,
             @Entity long playerId,
             @Slot(PlayerStatus.class) PlayerStatus status,
-            @Reflect(CameraFading.class) CameraFading fading
+            @Reflect(CameraFading.class) CameraFading fading,
+            @Reflect(CameraRotationFading.class) CameraRotationFading rotationFading
     ) {
         if (lockEvents.findAny().isEmpty()) return;
         if (status.lockedEntity != 0) {
-            unlock(fading, status);
+            unlock(fading, status, rotationFading);
             return;
         }
 
@@ -94,7 +102,7 @@ public class Players {
             if (Objects.isNull(predicate.targetEntity))
                 return;
 
-            lock(fading, status, mc, playerId, predicate);
+            lock(fading, rotationFading, status, mc, playerId, predicate);
         } catch(Exception ignored) {}
     }
 
@@ -130,7 +138,8 @@ public class Players {
     void unlockUnusual(
             @Entity long id,
             @Slot(PlayerStatus.class) PlayerStatus status,
-            @Reflect(CameraFading.class) CameraFading fading
+            @Reflect(CameraFading.class) CameraFading fading,
+            @Reflect(CameraRotationFading.class) CameraRotationFading rotation
     ) {
         ClientLevel level = mc.level;
         assert level != null;
@@ -138,13 +147,13 @@ public class Players {
 
         var entity = level.getEntity(status.lockedEntity);
         if (Objects.isNull(entity)) {
-            unlock(fading, status);
+            unlock(fading, status, rotation);
             return;
         }
 
         var player = level.getEntity((int) id);
         if (player != null && entity.distanceToSqr(player) > 225) {
-            unlock(fading, status);
+            unlock(fading, status, rotation);
         }
     }
 }

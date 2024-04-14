@@ -51,7 +51,7 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    implementation 'com.github.reallyGoodBaker:ecs-core:v0.1.5-m'
+    implementation 'com.github.reallyGoodBaker:ecs-core:v0.1.5-n'
 
     modImplementation 'software.bernie.geckolib:geckolib-fabric-1.20.1:4.4.4'
 

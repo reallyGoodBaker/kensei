@@ -11,6 +11,7 @@ import top.rgb39.ecs.plugin.*;
 import top.rgb39.ecs.util.Logger;
 import top.rgb39.kensei_client.component.CameraFading;
 import top.rgb39.kensei_client.component.CameraOffset;
+import top.rgb39.kensei_client.component.CameraRotationFading;
 import top.rgb39.kensei_client.plugin.ItemGroupLoader;
 import top.rgb39.kensei_client.plugin.ItemLoader;
 import top.rgb39.kensei_client.plugin.PlayerPlugin;
@@ -44,6 +45,7 @@ public class KenseiClient implements ClientModInitializer {
         .addSingleComponent(mc)
         .addSingleComponent(new CameraOffset())
         .addSingleComponent(new CameraFading())
+        .addSingleComponent(new CameraRotationFading())
         .getRuntimeManager()
         .setScheduler(new ClientTickScheduler());
 
