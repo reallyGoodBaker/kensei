@@ -50,28 +50,37 @@ public class Cameras {
         var last = currentTime - rotationFading.startTime;
         var duration = rotationFading.duration;
         var remain = duration - last;
-        var progress = ((double) dt) / remain;
-
-        oy += 360;
-        y += 360;
+        var progress = (double) dt / remain;
 
         // 没有设置渐变
         if (duration < last || progress >= 1) {
             rotationFading.rotXO = ox;
             rotationFading.rotYO = oy;
-            return new float[] { y - 360, x };
+            return new float[] { y, x };
         }
 
-        var ty = (float) lerp(rotationFading.rotYO, y, progress);
-        var tx = (float) lerp(rotationFading.rotXO, x, progress);
+        var fp = Math.log10(progress * 9 + 1);
+        var ty = (float) angleLerp(rotationFading.rotYO, y, fp);
+        var tx = (float) angleLerp(rotationFading.rotXO, x, fp);
 
         rotationFading.rotXO = tx;
         rotationFading.rotYO = ty;
 
-        return new float[] { ty - 360, tx - 360 };
+        return new float[] { ty, tx };
     }
 
     public static double lerp(double from, double to, double progress) {
         return from + (to - from) * Math.max(0, Math.min(progress, 1));
+    }
+
+    public static double angleLerp(double from, double to, double progress) {
+        if (from * to >= 0)
+            return lerp(from, to, progress);
+
+        var d1 = to - from;
+        var d2 = to < 0
+                ? to + 360 - from
+                : to - 360 - from;
+        return from + (Math.abs(d1) < Math.abs(d2) ? d1 : d2) * Math.max(0, Math.min(progress, 1));
     }
 }

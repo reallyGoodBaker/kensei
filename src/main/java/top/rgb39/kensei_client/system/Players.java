@@ -126,11 +126,11 @@ public class Players {
             if (entity.is(pl) || EntityType.ITEM.equals(entity.getType())) return false;
             Vec3 posOffset = entity.position().subtract(pos);
             var m = view.dot(posOffset) / (view.length() * posOffset.length());
-            if (m > match) {
+            if (m > match && m > 0.707106781) {
                 match = m;
                 targetEntity = entity;
             }
-            return m > 0.5;
+            return true;
         }
     }
 
