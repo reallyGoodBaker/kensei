@@ -1,4 +1,4 @@
-package top.rgb39.kensei_client.component;
+package top.rgb39.kensei_client.component.camera;
 
 import top.rgb39.ecs.annotation.Component;
 

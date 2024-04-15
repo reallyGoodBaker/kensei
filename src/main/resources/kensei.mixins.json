@@ -6,7 +6,8 @@
   "mixins": [],
   "client": [
     "CameraAccessor",
-    "GameRendererMixin"
+    "GameRendererMixin",
+    "MinecraftMixin"
   ],
   "server": [],
   "injectors": {

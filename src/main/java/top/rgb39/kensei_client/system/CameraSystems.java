@@ -13,14 +13,18 @@ import top.rgb39.ecs.annotation.Slot;
 import top.rgb39.ecs.annotation.System;
 import top.rgb39.ecs.util.Option;
 import top.rgb39.ecs.util.Option.T;
-import top.rgb39.kensei_client.RenderRuntime;
+import top.rgb39.kensei_client.InternalRuntime;
 import top.rgb39.kensei_client.component.*;
+import top.rgb39.kensei_client.component.camera.CameraFading;
+import top.rgb39.kensei_client.component.camera.CameraOffset;
+import top.rgb39.kensei_client.component.camera.CameraRotationFading;
+import top.rgb39.kensei_client.component.camera.Overlook;
 import top.rgb39.kensei_client.mixin.CameraAccessor;
 import top.rgb39.kensei_client.util.Cameras;
 
 public class CameraSystems {
 
-    @System(runtimeLabel = RenderRuntime.RENDER_LEVEL)
+    @System(runtimeLabel = InternalRuntime.RENDER_LEVEL)
     void updateCamera(
         @top.rgb39.ecs.annotation.Entity long id,
         @Reflect(RenderLevelConfig.class) RenderLevelConfig conf,
@@ -28,7 +32,8 @@ public class CameraSystems {
         @Reflect(CameraOffset.class) CameraOffset off,
         @Reflect(CameraFading.class) CameraFading fading,
         @Reflect(CameraRotationFading.class) CameraRotationFading rotationFading,
-        @Slot(PlayerStatus.class) PlayerStatus status
+        @Reflect(Overlook.class) Overlook overlook,
+        @Slot(TargetLock.class) TargetLock lock
     ) {
         var it = Option.it(new T<LocalPlayer>() {});
 
@@ -53,6 +58,11 @@ public class CameraSystems {
         var ply = Mth.lerp(f, player.yo, player.getY()) + player.getEyeHeight();
         var plz = Mth.lerp(f, player.zo, player.getZ());
         var offsetMoveVec = new Vec3(off.dx, off.dy, off.dz);
+
+        if (lock.targetId != 0 && overlook.enable) {
+            offsetMoveVec = offsetMoveVec.add(overlook.dx, overlook.dy, overlook.dz);
+        }
+
         var cameraOffset = offset(mainCamera, offsetMoveVec);
 
         // 摄像机回到眼睛
@@ -71,7 +81,7 @@ public class CameraSystems {
         var camRotX = mainCamera.getXRot();
         var camRotY = mainCamera.getYRot();
 
-        if (status.lockedEntity == 0) {
+        if (lock.targetId == 0) {
             rot(camera, Cameras.fadeRotation((int) dt, rotationFading, yRot, xRot, camRotY, camRotX));
             move(camera, offsetMoveVec);
             return;
@@ -80,7 +90,7 @@ public class CameraSystems {
         Entity en;
 
         try (Level lvl = player.level()) {
-            en = lvl.getEntity(status.lockedEntity);
+            en = lvl.getEntity((int) lock.targetId);
             if (en == null) {
                 lvl.close();
                 return;

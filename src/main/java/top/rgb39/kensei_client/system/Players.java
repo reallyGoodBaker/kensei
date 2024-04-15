@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -13,9 +12,9 @@ import top.rgb39.ecs.annotation.System;
 import top.rgb39.ecs.annotation.*;
 import top.rgb39.ecs.arch.App;
 import top.rgb39.ecs.executor.RuntimeLabel;
-import top.rgb39.ecs.util.Logger;
-import top.rgb39.kensei_client.component.CameraFading;
-import top.rgb39.kensei_client.component.CameraRotationFading;
+import top.rgb39.kensei_client.component.TargetLock;
+import top.rgb39.kensei_client.component.camera.CameraFading;
+import top.rgb39.kensei_client.component.camera.CameraRotationFading;
 import top.rgb39.kensei_client.component.PlayerStatus;
 import top.rgb39.kensei_client.events.LockEvent;
 
@@ -38,24 +37,25 @@ public class Players {
 
             app.addEntity(
                     en.getId(),
-                    new PlayerStatus()
+                    new PlayerStatus(),
+                    new TargetLock()
             );
         });
 
         mc = Minecraft.getInstance();
     }
 
-    void unlock(CameraFading fading, PlayerStatus status, CameraRotationFading rotation) {
+    void unlock(CameraFading fading, TargetLock status, CameraRotationFading rotation) {
         var current = java.lang.System.currentTimeMillis();
-        status.lockedEntity = 0;
+        status.targetId = 0;
         fading.dx = 1;
-        fading.dz = 3;
+        fading.dz = 2.5;
         fading.startTime = current;
         rotation.startTime = current;
         rotation.duration = 120;
     }
 
-    void lock(CameraFading fading, CameraRotationFading rotation, PlayerStatus status, Minecraft mc, long playerId, LockEntityPredicate predicate) {
+    void lock(CameraFading fading, CameraRotationFading rotation, TargetLock status, Minecraft mc, long playerId, LockEntityPredicate predicate) {
         if (mc.player != null && mc.player.getId() == playerId) {
             mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
         }
@@ -63,7 +63,7 @@ public class Players {
         fading.dx = 1.6;
         fading.dz = 1.8;
         fading.startTime = current;
-        status.lockedEntity = predicate.targetEntity.getId();
+        status.targetId = predicate.targetEntity.getId();
         rotation.startTime = current + 100;
         rotation.duration = 160;
     }
@@ -72,12 +72,12 @@ public class Players {
     void toggleLock(
             @Read(LockEvent.class) Stream<LockEvent> lockEvents,
             @Entity long playerId,
-            @Slot(PlayerStatus.class) PlayerStatus status,
+            @Slot(TargetLock.class) TargetLock status,
             @Reflect(CameraFading.class) CameraFading fading,
             @Reflect(CameraRotationFading.class) CameraRotationFading rotationFading
     ) {
         if (lockEvents.findAny().isEmpty()) return;
-        if (status.lockedEntity != 0) {
+        if (status.targetId != 0) {
             unlock(fading, status, rotationFading);
             return;
         }
@@ -137,15 +137,15 @@ public class Players {
     @System(runtimeLabel = RuntimeLabel.BeforeUpdate)
     void unlockUnusual(
             @Entity long id,
-            @Slot(PlayerStatus.class) PlayerStatus status,
+            @Slot(TargetLock.class) TargetLock status,
             @Reflect(CameraFading.class) CameraFading fading,
             @Reflect(CameraRotationFading.class) CameraRotationFading rotation
     ) {
         ClientLevel level = mc.level;
         assert level != null;
-        if (status.lockedEntity == 0) return;
+        if (status.targetId == 0) return;
 
-        var entity = level.getEntity(status.lockedEntity);
+        var entity = level.getEntity((int) status.targetId);
         if (Objects.isNull(entity)) {
             unlock(fading, status, rotation);
             return;

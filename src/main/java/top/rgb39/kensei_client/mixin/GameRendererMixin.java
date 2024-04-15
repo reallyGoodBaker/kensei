@@ -47,7 +47,7 @@ public class GameRendererMixin {
         conf.poseStack = poseStack;
         conf.dt = dt;
         conf.mainCamera = mainCamera;
-        KenseiListeners.RENDER_LEVEL_LISTENER.run();
+        KenseiListeners.RENDER_LEVEL.run();
     }
 
 }

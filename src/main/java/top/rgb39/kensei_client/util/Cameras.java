@@ -1,14 +1,10 @@
 package top.rgb39.kensei_client.util;
 
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import top.rgb39.ecs.util.Logger;
-import top.rgb39.kensei_client.KenseiClient;
-import top.rgb39.kensei_client.component.CameraFading;
-import top.rgb39.kensei_client.component.CameraOffset;
-import top.rgb39.kensei_client.component.CameraRotationFading;
-import top.rgb39.kensei_client.mixin.CameraAccessor;
+import top.rgb39.kensei_client.component.camera.CameraFading;
+import top.rgb39.kensei_client.component.camera.CameraOffset;
+import top.rgb39.kensei_client.component.camera.CameraRotationFading;
 
 public class Cameras {
 

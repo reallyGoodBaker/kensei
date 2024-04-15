@@ -3,5 +3,6 @@
   "item.kensei.uchigatana": "打刀",
   "item.kensei": "剑圣",
   "key.kensei.lock": "锁定/取消锁定",
-  "category.kensei.keybinding": "剑圣"
+  "category.kensei.keybinding": "剑圣",
+  "key.kensei.overlook": "俯视视角"
 }
