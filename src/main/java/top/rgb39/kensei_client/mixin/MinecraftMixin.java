@@ -24,9 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import top.rgb39.ecs.plugin.EventWriter;
 import top.rgb39.ecs.plugin.Events;
-import top.rgb39.kensei_client.KenseiClient;
 import top.rgb39.kensei_client.KenseiListeners;
-import top.rgb39.kensei_client.component.TargetLock;
 import top.rgb39.kensei_client.system.KeyboardSystems;
 
 import javax.annotation.Nullable;

@@ -78,6 +78,12 @@ public class KenseiClient implements ClientModInitializer {
                         .getSystemChain(InternalRuntime.CLIENT_READY)
                         .runWithOnlyReflects(app);
             };
+
+            KenseiListeners.GUI_RENDER = () -> {
+                runtimeChain
+                        .getSystemChain(InternalRuntime.GUI_RENDER)
+                        .runWithOnlyReflects(app);
+            };
         }
 
         @Override

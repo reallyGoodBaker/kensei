@@ -8,6 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.*;
 import top.rgb39.ecs.annotation.Reflect;
 import top.rgb39.ecs.annotation.Slot;
 import top.rgb39.ecs.annotation.System;
@@ -147,6 +148,7 @@ public class CameraSystems {
         camera.invokeSetRotation(args[0], args[1]);
     }
 
+    // modified from Minecraft
     Vec3 offset(Camera camera, Vec3 offset) {
         var d = -offset.z;
         var e = offset.y;
@@ -163,4 +165,20 @@ public class CameraSystems {
         return new Vec3(g, h, i);
     }
 
+    public static Vector2f worldToScreen(Vec3 worldPos, Camera cam, int fov, double ws) {
+        var camPos = cam.getPosition();
+        var pointVec = worldPos.subtract(camPos);
+        var camDir = cam.getLookVector();
+        var camUp = cam.getUpVector();
+        var camLeft = cam.getLeftVector();
+        var pointVec3f = pointVec.toVector3f();
+
+        var x = camLeft.dot(pointVec3f);
+        var y = camUp.dot(pointVec3f);
+        var z = camDir.dot(pointVec3f);
+
+        var scale = fov / z * ws;
+
+        return new Vector2f((float) (x * scale), (float) (y * scale));
+    }
 }

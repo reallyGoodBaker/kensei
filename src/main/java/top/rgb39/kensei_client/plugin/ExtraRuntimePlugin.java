@@ -13,5 +13,6 @@ public class ExtraRuntimePlugin implements Plugin {
 
         chain.setSystemChain(InternalRuntime.RENDER_LEVEL, new SystemChain());
         chain.setSystemChain(InternalRuntime.CLIENT_READY, new SystemChain());
+        chain.setSystemChain(InternalRuntime.GUI_RENDER, new SystemChain());
     }
 }
