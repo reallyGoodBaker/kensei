@@ -1,50 +1,34 @@
 package top.rgb39.kensei_client.item;
 
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.animatable.client.RenderProvider;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.AnimationState;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.animation.PlayState;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-public class GeckoItem extends Item implements GeoItem {
-
-    private final Supplier<Object> rendererProvider = GeoItem.makeRenderer(this);
+public class GeckoItem extends Item implements GeoItem, AnimationController.AnimationStateHandler<GeoAnimatable> {
     private final AnimatableInstanceCache instanceCache = new SingletonAnimatableInstanceCache(this);
+
+    @Override
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        GeoItem.super.createGeoRenderer(consumer);
+    }
 
     public GeckoItem(Properties properties) {
         super(properties);
     }
 
     public GeckoItem() {
-        super(new FabricItemSettings());
+        super(new Item.Properties());
     }
 
-    @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
-            private final GeckoItemRenderer renderer = new GeckoItemRenderer();
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return this.renderer;
-            }
-        });
-    }
-
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return rendererProvider;
-    }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
@@ -65,4 +49,8 @@ public class GeckoItem extends Item implements GeoItem {
         return instanceCache;
     }
 
+    @Override
+    public PlayState handle(AnimationState state) {
+        return null;
+    }
 }

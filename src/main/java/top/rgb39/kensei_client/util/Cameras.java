@@ -1,10 +1,19 @@
 package top.rgb39.kensei_client.util;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.joml.*;
+import org.lwjgl.opengl.GL11;
+import top.rgb39.kensei_client.KenseiClient;
 import top.rgb39.kensei_client.component.camera.CameraFading;
+import top.rgb39.kensei_client.component.camera.CameraNear;
 import top.rgb39.kensei_client.component.camera.CameraOffset;
 import top.rgb39.kensei_client.component.camera.CameraRotationFading;
+
+import java.lang.Math;
 
 public class Cameras {
 
@@ -24,7 +33,6 @@ public class Cameras {
         off.dx = lerp(off.dx, fading.dx, progress);
         off.dy = lerp(off.dy, fading.dy, progress);
         off.dz = lerp(off.dz, fading.dz, progress);
-//        Logger.DEBUG.i("fade: %s, %s, %s".formatted(off.dx, off.dy, off.dz));
     }
 
     public static double[] getRotation(Vec3 facing, Vec3 offset) {
@@ -69,14 +77,20 @@ public class Cameras {
         return from + (to - from) * Math.max(0, Math.min(progress, 1));
     }
 
+    public static double angular(double a) {
+        return a < -180
+                ? a + 360
+                : a > 180
+                    ? a - 360
+                    : a;
+    }
+
     public static double angleLerp(double from, double to, double progress) {
-        if (from * to >= 0)
+        var d1 = to - from;
+        if (Math.abs(d1) <= 180)
             return lerp(from, to, progress);
 
-        var d1 = to - from;
-        var d2 = to < 0
-                ? to + 360 - from
-                : to - 360 - from;
-        return from + (Math.abs(d1) < Math.abs(d2) ? d1 : d2) * Math.max(0, Math.min(progress, 1));
+        return angular(lerp(d1 > 0 ? from + 360 : from - 360, to, progress));
     }
+
 }

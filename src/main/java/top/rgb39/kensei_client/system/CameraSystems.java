@@ -12,14 +12,12 @@ import org.joml.*;
 import top.rgb39.ecs.annotation.Reflect;
 import top.rgb39.ecs.annotation.Slot;
 import top.rgb39.ecs.annotation.System;
+import top.rgb39.ecs.util.Logger;
 import top.rgb39.ecs.util.Option;
 import top.rgb39.ecs.util.Option.T;
 import top.rgb39.kensei_client.InternalRuntime;
 import top.rgb39.kensei_client.component.*;
-import top.rgb39.kensei_client.component.camera.CameraFading;
-import top.rgb39.kensei_client.component.camera.CameraOffset;
-import top.rgb39.kensei_client.component.camera.CameraRotationFading;
-import top.rgb39.kensei_client.component.camera.Overlook;
+import top.rgb39.kensei_client.component.camera.*;
 import top.rgb39.kensei_client.mixin.CameraAccessor;
 import top.rgb39.kensei_client.util.Cameras;
 
@@ -34,6 +32,7 @@ public class CameraSystems {
         @Reflect(CameraFading.class) CameraFading fading,
         @Reflect(CameraRotationFading.class) CameraRotationFading rotationFading,
         @Reflect(Overlook.class) Overlook overlook,
+        @Reflect(CameraNear.class) CameraNear near,
         @Slot(TargetLock.class) TargetLock lock
     ) {
         var it = Option.it(new T<LocalPlayer>() {});
@@ -53,7 +52,10 @@ public class CameraSystems {
         var player = it.v();
 
         CameraType type = minecraft.options.getCameraType();
-        if (type.isFirstPerson()) return;
+        if (type.isFirstPerson()) {
+            near.enable = false;
+            return;
+        }
 
         var plx = Mth.lerp(f, player.xo, player.getX());
         var ply = Mth.lerp(f, player.yo, player.getY()) + player.getEyeHeight();
@@ -72,6 +74,7 @@ public class CameraSystems {
         // 处理第三人称面向玩家的视角
         if (type.isMirrored()) {
             move(camera, offsetMoveVec);
+            near.enable = false;
             return;
         }
 
@@ -85,6 +88,7 @@ public class CameraSystems {
         if (lock.targetId == 0) {
             rot(camera, Cameras.fadeRotation((int) dt, rotationFading, yRot, xRot, camRotY, camRotX));
             move(camera, offsetMoveVec);
+            near.enable = false;
             return;
         }
 
@@ -128,6 +132,17 @@ public class CameraSystems {
             entityCameraVec = entityCameraVec.multiply(scale, scale, scale);
         }
 
+        var projectZ = -mainCamera.getLookVector().dot(facing.add(entityCameraVec).toVector3f());
+
+        if (xRot < 0) {
+            projectZ = projectZ + 0.02f * xRot - 0.2f;
+        } else {
+            projectZ = projectZ - 0.02f * xRot - 0.2f;
+        }
+
+        near.enable = true;
+        near.value = projectZ;
+
         pos(camera, entityCameraVec.add(enPosVec));
         rot(camera, Cameras.fadeRotation((int) dt, rotationFading, rotY, rotX, camRotY, camRotX));
     }
@@ -163,22 +178,5 @@ public class CameraSystems {
         double i = (double)forwards.z() * d + (double)up.z() * e + (double)left.z() * f;
 
         return new Vec3(g, h, i);
-    }
-
-    public static Vector2f worldToScreen(Vec3 worldPos, Camera cam, int fov, double ws) {
-        var camPos = cam.getPosition();
-        var pointVec = worldPos.subtract(camPos);
-        var camDir = cam.getLookVector();
-        var camUp = cam.getUpVector();
-        var camLeft = cam.getLeftVector();
-        var pointVec3f = pointVec.toVector3f();
-
-        var x = camLeft.dot(pointVec3f);
-        var y = camUp.dot(pointVec3f);
-        var z = camDir.dot(pointVec3f);
-
-        var scale = fov / z * ws;
-
-        return new Vector2f((float) (x * scale), (float) (y * scale));
     }
 }

@@ -1,6 +1,7 @@
 package top.rgb39.kensei_client.system;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
@@ -22,8 +23,6 @@ public class GuiSystems {
         var guiGraphics = conf.guiGraphics;
         var minecraft = Minecraft.getInstance();
         var player = minecraft.player;
-        var cam = minecraft.gameRenderer.getMainCamera();
-        int fov = minecraft.options.fov().get();
         var lock = (TargetLock) KenseiClient.clientApp.getComponent(player.getId(), TargetLock.class);
         var camType = minecraft.options.getCameraType();
         var ws = minecraft.getWindow().getGuiScale();
@@ -46,7 +45,7 @@ public class GuiSystems {
         var hitResult = minecraft.hitResult;
         var hitType = hitResult.getType();
         if (hitType == HitResult.Type.MISS) {
-            pose.last().pose().translate(centerX, centerY, 0).scale(nws);
+            pose.last().pose().scale(nws).translate(centerX, centerY, 0);
             guiGraphics.fill(-11, -2, 11, 2, 0x22000000);
             guiGraphics.fill(-2, -11, 2, 11, 0x22000000);
             guiGraphics.fill(-10, -1, 10, 1, 0x44ffffff);
@@ -56,13 +55,13 @@ public class GuiSystems {
         }
 
         var hitPos = hitResult.getLocation();
-        var screenPoint = CameraSystems.worldToScreen(hitPos, cam, fov, ws);
+        var screenPoint = RendererUtils.worldSpaceToScreenSpace(hitPos).scale(ws);
 
         if (hitType == HitResult.Type.BLOCK) {
-            var x = centerX - (int) screenPoint.x;
-            var y = centerY - (int) screenPoint.y;
+            var x = (int) screenPoint.x;
+            var y = (int) screenPoint.y;
 
-            pose.last().pose().translate(x - 5, y, 0).scale(nws);
+            pose.last().pose().scale(nws).translate(x, y, 0);
             guiGraphics.fill(-11, -2, 11, 2, 0x88000000);
             guiGraphics.fill(-2, -11, 2, 11, 0x88000000);
             guiGraphics.fill(-10, -1, 10, 1, 0xddffffff);
@@ -72,10 +71,10 @@ public class GuiSystems {
         }
 
         if (hitType == HitResult.Type.ENTITY) {
-            var x = centerX - (int) screenPoint.x;
-            var y = centerY - (int) screenPoint.y;
+            var x = (int) screenPoint.x;
+            var y = (int) screenPoint.y;
 
-            pose.last().pose().translate(x - 5, y, 0).scale(nws);
+            pose.last().pose().scale(nws).translate(x, y, 0);
             guiGraphics.fill(-11, -2, 11, 2, 0x88000000);
             guiGraphics.fill(-2, -11, 2, 11, 0x88000000);
             guiGraphics.fill(-10, -1, 10, 1, 0xddffff44);
@@ -94,8 +93,6 @@ public class GuiSystems {
         var centerY = screenHeight / 2;
         var pose = guiGraphics.pose();
         var minecraft = Minecraft.getInstance();
-        var cam = minecraft.gameRenderer.getMainCamera();
-        int fov = minecraft.options.fov().get();
         var camType = minecraft.options.getCameraType();
         var ws = minecraft.getWindow().getGuiScale();
         var nws = (float) (1 / ws);
@@ -123,19 +120,19 @@ public class GuiSystems {
             return;
         }
 
-        var hudPoint = CameraSystems.worldToScreen(Positions.pos(en, f), cam, fov, ws);
-        var hudX = centerX - hudPoint.x;
-        var hudY = centerY - hudPoint.y;
+        var hudPoint = RendererUtils.worldSpaceToScreenSpace(Positions.pos(en, f)).scale(ws);
+        var hudX = (int) hudPoint.x;
+        var hudY = (int) hudPoint.y;
         var maxHealth = en.getMaxHealth();
         var health = Math.min(en.getHealth() / (maxHealth == 0 ? Double.MAX_VALUE : maxHealth), 1);
-        pose.last().pose().translate(hudX + 40, hudY - 20, 0).scale(nws);
+        pose.last().pose().scale(nws).translate(hudX + 40, hudY - 20, 0);
         guiGraphics.fill(-8, -8, 148, 48, 0x88000000);
         guiGraphics.fill(0, 20, 140, 40, 0x88880000);
         guiGraphics.fill(0, 20, (int) (140 * health), 40, 0xff008800);
         pose.popPose();
         pose.pushPose();
-        pose.last().pose().translate(hudX + 40, hudY - 20, 0).scale(nws * 2);
-        guiGraphics.drawString(minecraft.font, en.getDisplayName(), 0, 0, 0xffffffff);
+        pose.last().pose().translate((hudX + 40) * nws, (hudY - 20) * nws, 0);
+        guiGraphics.drawString(minecraft.font, en.getName(), 0, 0, 0xffffffff);
         var healthLabel = "%.1f/%.1f".formatted(Math.min(en.getHealth(), en.getMaxHealth()), en.getMaxHealth());
         guiGraphics.drawString(minecraft.font, healthLabel, (70 - minecraft.font.width(healthLabel)) / 2, 11, 0xffffffff);
         pose.popPose();

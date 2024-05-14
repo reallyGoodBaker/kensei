@@ -1,17 +1,46 @@
 package top.rgb39.kensei_client.player;
 
-import com.mojang.authlib.GameProfile;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.GeoReplacedEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 
-public class PlayerEntity extends Player implements GeoAnimatable {
-    public PlayerEntity(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(level, blockPos, f, gameProfile);
+public class PlayerEntity extends LivingEntity implements GeoReplacedEntity {
+
+    public PlayerEntity(EntityType<? extends LivingEntity> entityType, Level level) {
+        super(EntityType.PLAYER, level);
     }
+
+    @Override
+    public Iterable<ItemStack> getArmorSlots() {
+        return null;
+    }
+
+    @Override
+    public ItemStack getItemBySlot(EquipmentSlot equipmentSlot) {
+        return null;
+    }
+
+    @Override
+    public void setItemSlot(EquipmentSlot equipmentSlot, ItemStack itemStack) {
+
+    }
+
+    @Override
+    public HumanoidArm getMainArm() {
+        return null;
+    }
+
+    @Override
+    public EntityType<?> getReplacingEntityType() {
+        return EntityType.PLAYER;
+    }
+
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
@@ -21,20 +50,5 @@ public class PlayerEntity extends Player implements GeoAnimatable {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return null;
-    }
-
-    @Override
-    public double getTick(Object object) {
-        return 0;
-    }
-
-    @Override
-    public boolean isSpectator() {
-        return false;
-    }
-
-    @Override
-    public boolean isCreative() {
-        return false;
     }
 }

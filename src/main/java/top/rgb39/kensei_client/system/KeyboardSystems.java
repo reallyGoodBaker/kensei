@@ -9,7 +9,6 @@ import top.rgb39.ecs.annotation.System;
 import top.rgb39.ecs.annotation.Write;
 import top.rgb39.ecs.executor.RuntimeLabel;
 import top.rgb39.ecs.plugin.EventWriter;
-import top.rgb39.ecs.util.Logger;
 import top.rgb39.kensei_client.InternalRuntime;
 import top.rgb39.kensei_client.KenseiClient;
 import top.rgb39.kensei_client.component.TargetLock;

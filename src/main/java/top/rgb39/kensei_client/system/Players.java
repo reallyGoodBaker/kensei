@@ -31,7 +31,7 @@ public class Players {
             @Reflect(App.class) App app
     ) {
         ClientEntityEvents.ENTITY_LOAD.register((en, w) -> {
-            if (!"entity.minecraft.player".equals(en.getType().toString())) {
+            if (!EntityType.PLAYER.equals(en.getType())) {
                 return;
             }
 
@@ -95,7 +95,7 @@ public class Players {
 
             lvl.getEntities(
                     pl,
-                    new AABB(blockPos.offset(-10, -3, -10), blockPos.offset(10, 3, 10)),
+                    new AABB(blockPos.offset(-10, -3, -10).getCenter(), blockPos.offset(10, 3, 10).getCenter()),
                     predicate
             );
 
