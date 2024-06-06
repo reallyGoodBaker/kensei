@@ -1,33 +1,39 @@
 package top.rgb39.kensei_client.plugin;
 
-import top.rgb39.ecs.annotation.Reflect;
-import top.rgb39.ecs.annotation.System;
-import top.rgb39.ecs.arch.App;
-import top.rgb39.ecs.executor.RuntimeLabel;
-import top.rgb39.ecs.plugin.Plugin;
+import com.mojang.authlib.GameProfile;
+import com.tom.cpm.api.ICPMPlugin;
+import com.tom.cpm.api.IClientAPI;
+import com.tom.cpm.api.ICommonAPI;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 
-public class PlayerPlugin implements Plugin {
+import java.io.InputStream;
 
-    public static final Long CLIENT_ID = -1L;
+public class PlayerPlugin implements ICPMPlugin {
+
+    static IClientAPI.PlayerRenderer<Model, ResourceLocation, RenderType, MultiBufferSource, GameProfile> renderer;
 
     @Override
-    public void build(App app) {
-//        Registry.register(
-//                Registries.ENTITY_TYPE, "minecraft:player",
-//                FabricEntityTypeBuilder
-//                        .create(MobCategory.CREATURE, PlayerEntity::new)
-//                        .build()
-//        );
+    public void initClient(IClientAPI api) {
+        renderer = api.createPlayerRenderer(Model.class, ResourceLocation.class, RenderType.class, MultiBufferSource.class, GameProfile.class);
+        try {
+            InputStream is = Minecraft.getInstance().getResourceManager().open(new ResourceLocation("kensei", "cpm/rigged_player_slim.cpmmodel"));
+            renderer.setLocalModel(api.loadModel("slim", is));
+            renderer.postRender();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @System(runtimeLabel = RuntimeLabel.Startup)
-    void init(
-        @Reflect(App.class) App app
-    ) {
-//        app.addEntity(
-//                CLIENT_ID,
-//                new CameraOffset(),
-//                new CameraFading()
-//        );
+    @Override
+    public void initCommon(ICommonAPI api) {
+    }
+
+    @Override
+    public String getOwnerModId() {
+        return "kensei";
     }
 }

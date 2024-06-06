@@ -8,7 +8,6 @@ import top.rgb39.ecs.executor.RuntimeChain;
 import top.rgb39.ecs.executor.RuntimeLabel;
 import top.rgb39.ecs.executor.RuntimeSchedular;
 import top.rgb39.ecs.plugin.*;
-import top.rgb39.ecs.util.Arrays;
 import top.rgb39.ecs.util.Logger;
 import top.rgb39.kensei_client.component.camera.CameraFading;
 import top.rgb39.kensei_client.component.camera.CameraOffset;
@@ -16,18 +15,16 @@ import top.rgb39.kensei_client.component.camera.CameraRotationFading;
 import top.rgb39.kensei_client.component.camera.Overlook;
 import top.rgb39.kensei_client.plugin.ItemGroupLoader;
 import top.rgb39.kensei_client.plugin.ItemLoader;
-import top.rgb39.kensei_client.plugin.PlayerPlugin;
 import top.rgb39.kensei_client.plugin.ExtraRuntimePlugin;
 
 public class KenseiClient implements ClientModInitializer {
 
     public static App clientApp = App.empty();
 
-    final static Logger D = Logger.DEBUG;
-
     @Override
     public void onInitializeClient() {
         Logger.enableLogger(Logger.DEBUG);
+        Logger.enableLogger(Logger.ECS);
         Logger.enableLogger("tick");
         initClient(Minecraft.getInstance());
     }
@@ -41,8 +38,7 @@ public class KenseiClient implements ClientModInitializer {
                 new Events(),
                 new SystemLoaderPlugin(),
                 new ItemLoader(),
-                new ItemGroupLoader(),
-                new PlayerPlugin()
+                new ItemGroupLoader()
         )
         .addSingleComponent(clientApp)
         .addSingleComponent(mc)

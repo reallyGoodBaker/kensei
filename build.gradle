@@ -1,6 +1,7 @@
 plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
+    id "com.modrinth.minotaur" version "2.+"
 }
 
 version = project.mod_version
@@ -49,6 +50,21 @@ repositories {
                 includeGroupByRegex 'dev\\.onyxstudios.*'
             }
         }
+
+        maven {
+            name = "tom5454 maven"
+            url = "https://raw.githubusercontent.com/tom5454/maven/main"
+        }
+
+        maven {
+            name = 'Ladysnake Mods'
+            url = 'https://maven.ladysnake.org/releases'
+            content {
+                includeGroup 'io.github.ladysnake'
+                includeGroup 'org.ladysnake'
+                includeGroupByRegex 'dev\\.onyxstudios.*'
+            }
+        }
     }
 }
 
@@ -60,10 +76,15 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    implementation 'com.github.reallyGoodBaker:ecs-core:v0.1.5-n'
-    modImplementation 'software.bernie.geckolib:geckolib-fabric-1.20.5:4.5'
+    include modImplementation('com.github.reallyGoodBaker:ecs-core:v0.1.6g')
+    modImplementation 'software.bernie.geckolib:geckolib-fabric-1.20.6:4.5.1'
+    modImplementation "org.ladysnake:satin:${satin_version}"
+    include "org.ladysnake:satin:${satin_version}"
 
     include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
+
+    compileOnly "com.tom5454.cpm:CustomPlayerModels-API:${project.cpm_api_version}"
+    modRuntimeOnly "com.tom5454.cpm:CustomPlayerModels-Fabric-${project.cpm_mc_version}:${project.cpm_runtime_version}"
 }
 
 processResources {
@@ -123,5 +144,21 @@ publishing {
         // Notice: This block does NOT have the same function as the block in the top level.
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
+    }
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN") // Remember to have the MODRINTH_TOKEN environment variable set or else this will fail - just make sure it stays private!
+    projectId = "nispwv3F" // This can be the project ID or the slug. Either will work!
+    versionNumber = "0.0.1" // You don't need to set this manually. Will fail if Modrinth has this version already
+    versionType = "release" // This is the default -- can also be `beta` or `alpha`
+    uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
+    gameVersions = ["1.20.6" ] // Must be an array, even with only one version
+    loaders = ["fabric"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
+    dependencies { // A special DSL for creating dependencies
+        // scope.type
+        // The scope can be `required`, `optional`, `incompatible`, or `embedded`
+        // The type can either be `project` or `version`
+        required.project "fabric-api", "Renderer", "ecs-core" // Creates a new required dependency on Fabric API
     }
 }

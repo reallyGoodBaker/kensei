@@ -3,6 +3,7 @@ package top.rgb39.kensei_client.system;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -16,17 +17,17 @@ import top.rgb39.kensei_client.util.Positions;
 
 public class GuiSystems {
 
-    @System(runtimeLabel = InternalRuntime.GUI_RENDER)
+    @System(runtimeLabel = InternalRuntime.GUI_RENDER, asynchronous = true)
     void renderCrosshair(@Reflect(GuiRenderConfig.class) GuiRenderConfig conf) {
         var screenWidth = conf.screenWidth;
         var screenHeight = conf.screenHeight;
         var guiGraphics = conf.guiGraphics;
         var minecraft = Minecraft.getInstance();
         var player = minecraft.player;
+        assert player != null;
         var lock = (TargetLock) KenseiClient.clientApp.getComponent(player.getId(), TargetLock.class);
         var camType = minecraft.options.getCameraType();
-        var ws = minecraft.getWindow().getGuiScale();
-        var nws = (float) (1 / ws);
+        var nws = .5f;
 
         if (
                 camType.isFirstPerson() ||
@@ -43,9 +44,11 @@ public class GuiSystems {
         pose.pushPose();
 
         var hitResult = minecraft.hitResult;
+        assert hitResult != null;
         var hitType = hitResult.getType();
         if (hitType == HitResult.Type.MISS) {
-            pose.last().pose().scale(nws).translate(centerX, centerY, 0);
+            var s = 2 / (float) minecraft.getWindow().getGuiScale();
+            pose.last().pose().scale(nws).translate(centerX * s, centerY * s, 0);
             guiGraphics.fill(-11, -2, 11, 2, 0x22000000);
             guiGraphics.fill(-2, -11, 2, 11, 0x22000000);
             guiGraphics.fill(-10, -1, 10, 1, 0x44ffffff);
@@ -55,7 +58,7 @@ public class GuiSystems {
         }
 
         var hitPos = hitResult.getLocation();
-        var screenPoint = RendererUtils.worldSpaceToScreenSpace(hitPos).scale(ws);
+        var screenPoint = RendererUtils.worldSpaceToScreenSpace(hitPos).scale(2);
 
         if (hitType == HitResult.Type.BLOCK) {
             var x = (int) screenPoint.x;
@@ -83,21 +86,18 @@ public class GuiSystems {
         }
     }
 
-    @System(runtimeLabel = InternalRuntime.GUI_RENDER)
+    @System(runtimeLabel = InternalRuntime.GUI_RENDER, asynchronous = true)
     void renderHud(@Reflect(GuiRenderConfig.class) GuiRenderConfig conf) {
-        var screenWidth = conf.screenWidth;
-        var screenHeight = conf.screenHeight;
         var guiGraphics = conf.guiGraphics;
         var f = conf.f;
-        var centerX = screenWidth / 2;
-        var centerY = screenHeight / 2;
         var pose = guiGraphics.pose();
         var minecraft = Minecraft.getInstance();
         var camType = minecraft.options.getCameraType();
-        var ws = minecraft.getWindow().getGuiScale();
-        var nws = (float) (1 / ws);
+        var nws = .5f;
         var hitResult = minecraft.hitResult;
+        assert hitResult != null;
         var hitType = hitResult.getType();
+        assert minecraft.player != null;
         var lock = (TargetLock) KenseiClient.clientApp.getComponent(minecraft.player.getId(), TargetLock.class);
 
         if (camType.isMirrored()) {
@@ -112,15 +112,19 @@ public class GuiSystems {
         }
 
         pose.pushPose();
-        var e = lock.targetId != 0
-                ? minecraft.level.getEntity((int) lock.targetId)
-                : ((EntityHitResult) hitResult).getEntity();
+        Entity e;
+        if (lock.targetId != 0) {
+            assert minecraft.level != null;
+            e = minecraft.level.getEntity((int) lock.targetId);
+        } else {
+            e = ((EntityHitResult) hitResult).getEntity();
+        }
 
         if (!(e instanceof LivingEntity en)) {
             return;
         }
 
-        var hudPoint = RendererUtils.worldSpaceToScreenSpace(Positions.pos(en, f)).scale(ws);
+        var hudPoint = RendererUtils.worldSpaceToScreenSpace(Positions.pos(en, f)).scale(2);
         var hudX = (int) hudPoint.x;
         var hudY = (int) hudPoint.y;
         var maxHealth = en.getMaxHealth();

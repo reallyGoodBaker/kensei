@@ -17,7 +17,8 @@
     ],
     "main": [
       "top.rgb39.kensei.Kensei"
-    ]
+    ],
+    "cpmapi": [ "top.rgb39.kensei_client.plugin.PlayerPlugin"  ]
   },
   "depends": {
     "fabricloader": ">=${loader_version}",
