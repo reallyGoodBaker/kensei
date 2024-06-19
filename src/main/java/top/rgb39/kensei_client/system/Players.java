@@ -1,6 +1,8 @@
 package top.rgb39.kensei_client.system;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -8,14 +10,17 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import top.rgb39.common.AnimPacket;
 import top.rgb39.ecs.annotation.System;
 import top.rgb39.ecs.annotation.*;
 import top.rgb39.ecs.arch.App;
 import top.rgb39.ecs.executor.RuntimeLabel;
+import top.rgb39.ecs.util.Logger;
 import top.rgb39.kensei_client.component.TargetLock;
 import top.rgb39.kensei_client.component.camera.CameraFading;
 import top.rgb39.kensei_client.component.camera.CameraRotationFading;
 import top.rgb39.kensei_client.component.PlayerStatus;
+import top.rgb39.kensei_client.events.KeyDown;
 import top.rgb39.kensei_client.events.LockEvent;
 
 import java.util.Objects;
@@ -154,6 +159,24 @@ public class Players {
         var player = level.getEntity((int) id);
         if (player != null && entity.distanceToSqr(player) > 225) {
             unlock(fading, status, rotation);
+        }
+    }
+
+    @System(runtimeLabel = RuntimeLabel.BeforeUpdate)
+    void playAnim(
+        @Entity long id,
+        @Read(KeyDown.class) Stream<KeyDown> keyDownStream
+    ) {
+        ClientLevel level = mc.level;
+        var player = level.getEntity((int) id);
+        var pressL0 = keyDownStream.anyMatch(ev -> ev.key() == InputConstants.MOUSE_BUTTON_LEFT);
+
+        if (pressL0 && player != null) {
+            try {
+                ClientPlayNetworking.send(new AnimPacket("kensei:stab"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

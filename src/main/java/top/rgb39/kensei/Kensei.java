@@ -12,6 +12,8 @@ import top.rgb39.ecs.executor.RuntimeLabel;
 import top.rgb39.ecs.executor.RuntimeSchedular;
 import top.rgb39.ecs.util.Logger;
 import top.rgb39.kensei.component.ServerTick;
+import top.rgb39.kensei.plugin.CpmPlugin;
+import top.rgb39.kensei.plugin.PacketPlugin;
 
 public class Kensei implements ModInitializer {
 
@@ -27,6 +29,10 @@ public class Kensei implements ModInitializer {
         App app = App.create(
             "top/rgb39/kensei",
             "mod/kensei/server"
+        );
+
+        app.addPlugins(
+            new PacketPlugin()
         );
 
         app.getRuntimeManager().setScheduler(new ServerTickScheduler());

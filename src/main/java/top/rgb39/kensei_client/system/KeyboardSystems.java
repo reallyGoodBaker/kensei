@@ -33,14 +33,13 @@ public class KeyboardSystems {
 
     @System(runtimeLabel = RuntimeLabel.Startup)
     void setupKeybindings() {
-        var lock = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-                LOCK,
-                InputConstants.Type.KEYSYM,
-                InputConstants.KEY_G,
-                CATEGORY
-        ));
-
-        registerKeyboardEvent(lock,
+        registerKeyboardEvent(
+                KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                        LOCK,
+                        InputConstants.Type.KEYSYM,
+                        InputConstants.KEY_G,
+                        CATEGORY
+                )),
                 (writer, flow) -> writer.write(new LockEvent())
         );
 

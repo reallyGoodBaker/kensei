@@ -1,6 +1,8 @@
 package top.rgb39.kensei_client.item;
 
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -10,15 +12,26 @@ import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
 
 public class GeckoItem extends Item implements GeoItem, AnimationController.AnimationStateHandler<GeoAnimatable> {
-    private final AnimatableInstanceCache instanceCache = new SingletonAnimatableInstanceCache(this);
+    private final AnimatableInstanceCache instanceCache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
-        GeoItem.super.createGeoRenderer(consumer);
+        consumer.accept(new GeoRenderProvider() {
+            public GeckoItemRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
+                if (renderer == null)
+                    renderer = new GeckoItemRenderer();
+
+                return renderer;
+            }
+        });
     }
 
     public GeckoItem(Properties properties) {

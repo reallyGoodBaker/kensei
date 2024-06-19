@@ -81,7 +81,7 @@ dependencies {
     modImplementation "org.ladysnake:satin:${satin_version}"
     include "org.ladysnake:satin:${satin_version}"
 
-    include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
+    include modImplementation("com.github.0x3C50:Renderer:b2f7b5e3bb")
 
     compileOnly "com.tom5454.cpm:CustomPlayerModels-API:${project.cpm_api_version}"
     modRuntimeOnly "com.tom5454.cpm:CustomPlayerModels-Fabric-${project.cpm_mc_version}:${project.cpm_runtime_version}"
